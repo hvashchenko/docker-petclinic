@@ -1,9 +1,33 @@
-mysql:
-  image: mysql:5.7
-  ports:
-    - "3306:3306"
-  environment:
-    - MYSQL_ROOT_PASSWORD=petclinic
-    - MYSQL_DATABASE=petclinic
-  volumes:
-    - "./conf.d:/etc/mysql/conf.d:ro"
+version: '2'
+services:
+    mysql:
+        container_name: test-db
+        image: mysql:5.7
+        ports:
+            - "3006:3306"
+        environment:
+            - MYSQL_ROOT_PASSWORD=petclinic
+            - MYSQL_DATABASE=petclinic
+        volumes:
+            - "./conf.d:/etc/mysql/conf.d:ro"
+    app:
+        container_name: test-app
+        build: ./app
+        links:
+            - mysql
+            - nginx
+        ports:
+            - "8080"
+        volumes:
+            - ./app:/app
+        environment:
+            - JAVA_APP=app_for_test
+    nginx:
+        container_name: test-nginx
+        image: nginx:1.13
+        restart: always
+        ports:
+            - 80:80
+            - 443:443
+        volumes:
+            - ./nginx/conf.d:/etc/nginx/conf.d
